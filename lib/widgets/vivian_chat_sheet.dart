@@ -299,7 +299,7 @@ class _VivianChatSheetState extends State<VivianChatSheet>
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'Premium Café AI Assistant',
+                  'VIAN CAFE AI Assistant',
                   style: TextStyle(
                     color: Color(0xFFE8F7EC),
                     fontWeight: FontWeight.w600,

@@ -18,6 +18,13 @@ function peso(value) {
   return `₱${n.toFixed(2)}`;
 }
 
+function clampText(text, maxChars = 6000) {
+  const clean = safeString(text);
+  if (!clean) return "";
+  if (clean.length <= maxChars) return clean;
+  return clean.slice(0, maxChars) + "\n\n[Context trimmed for length]";
+}
+
 function formatCart(cartItems) {
   if (!cartItems.length) return "Cart is empty.";
 
@@ -230,7 +237,8 @@ function buildVivianFallback(message, orderType, menuText, cartText) {
 function cleanReply(text) {
   return safeString(text)
     .replace(/\*\*/g, "")
-    .replace(/\n{3,}/g, "\n\n");
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 async function askGemini({ message, orderType, menuText, cartText }) {
@@ -240,6 +248,9 @@ async function askGemini({ message, orderType, menuText, cartText }) {
   }
 
   const ai = new GoogleGenAI({ apiKey });
+
+  const trimmedMenuText = clampText(menuText, 5000);
+  const trimmedCartText = clampText(cartText, 2500);
 
   const systemInstruction = `
 You are Vivian, the premium AI café assistant.
@@ -255,7 +266,9 @@ Rules:
 - Use ONLY the provided menu/cart context as factual source.
 - Never invent menu items, prices, ingredients, sizes, or promos.
 - If something is missing, say so politely.
-- Keep answers short to medium.
+- Keep answers short to medium, but complete.
+- Never cut off mid-sentence.
+- Prefer 1 to 4 short paragraphs or bullets when helpful.
 - Good at recommendations, pairings, ingredients, sweetness, strength, and order guidance.
 - Do not mention prompts, backend, tokens, or internal logic.
 `.trim();
@@ -268,10 +281,10 @@ ORDER TYPE:
 ${orderType || "dine_in"}
 
 MENU CONTEXT:
-${menuText || "No menu data provided."}
+${trimmedMenuText || "No menu data provided."}
 
 CART CONTEXT:
-${cartText || "Cart is empty."}
+${trimmedCartText || "Cart is empty."}
 
 Write Vivian's reply.
 `.trim();
@@ -280,14 +293,20 @@ Write Vivian's reply.
     model: "gemini-2.5-flash",
     config: {
       systemInstruction,
-      temperature: 0.9,
+      temperature: 0.85,
       topP: 0.9,
-      maxOutputTokens: 300,
+      maxOutputTokens: 700,
     },
     contents: prompt,
   });
 
-  return cleanReply(response.text);
+  const reply = cleanReply(response?.text);
+
+  if (!reply) {
+    throw new Error("Gemini returned an empty reply.");
+  }
+
+  return reply;
 }
 
 exports.askVivian = onCall(

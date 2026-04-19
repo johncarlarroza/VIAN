@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vian_kopi/widgets/vivian_chat_sheet.dart';
@@ -31,8 +30,8 @@ class _MenuScreenState extends State<MenuScreen>
   late final Animation<double> _bubbleScale;
   late final Animation<Offset> _bubbleSlide;
 
-  double _vivianTop = 120;
-  double _vivianLeft = 0;
+  double _vivianTop = 110;
+  double _vivianLeft = 8;
   bool _vivianPositionReady = false;
   bool _showSearch = false;
 
@@ -56,7 +55,7 @@ class _MenuScreenState extends State<MenuScreen>
 
     _bubbleSlide =
         Tween<Offset>(
-          begin: const Offset(0.12, -0.12),
+          begin: const Offset(-0.12, -0.12),
           end: Offset.zero,
         ).animate(
           CurvedAnimation(
@@ -110,33 +109,185 @@ class _MenuScreenState extends State<MenuScreen>
     });
   }
 
-  Widget _buildSearchToggleButton() {
-    return InkWell(
-      onTap: _toggleSearch,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        width: 42,
-        height: 42,
-        decoration: BoxDecoration(
-          color: const Color(0xFFF3F5F7),
-          borderRadius: BorderRadius.circular(14),
-        ),
-        child: Icon(
-          _showSearch ? Icons.close_rounded : Icons.search_rounded,
-          color: const Color(0xFF1E2C24),
-          size: 20,
-        ),
-      ),
-    );
-  }
-
   void _initVivianPosition(BoxConstraints constraints) {
     if (_vivianPositionReady) return;
 
-    final bubbleWidth = _bubbleWidth(constraints.maxWidth);
-    _vivianLeft = constraints.maxWidth - bubbleWidth - 12;
-    _vivianTop = constraints.maxHeight > 220 ? 110 : 80;
+    _vivianLeft = 7;
+    _vivianTop = constraints.maxHeight > 220 ? 140 : 80;
     _vivianPositionReady = true;
+  }
+
+  Future<void> _showCustomerInfoDialog() async {
+    final nameController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Container(
+            width: 420,
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE9F5EC),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Icon(
+                        Icons.person_outline_rounded,
+                        color: Color(0xFF1F6D44),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Customer Information',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF213229),
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Customer name is optional before payment.',
+                            style: TextStyle(
+                              color: Color(0xFF7C8B84),
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                TextField(
+                  controller: nameController,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: InputDecoration(
+                    labelText: 'Customer Name (optional)',
+                    hintText: 'Leave blank for Walk-in Customer',
+                    filled: true,
+                    fillColor: const Color(0xFFF6F8F9),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFE2E7EB)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFE2E7EB)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(
+                        color: Color(0xFF1F6D44),
+                        width: 1.4,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'If left empty, the transaction will be saved as Walk-in Customer.',
+                  style: TextStyle(
+                    color: Color(0xFF8A9690),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(52),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          side: const BorderSide(color: Color(0xFFE2E7EB)),
+                        ),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          final customerName =
+                              nameController.text.trim().isEmpty
+                              ? 'Walk-in Customer'
+                              : nameController.text.trim();
+
+                          Navigator.pop(dialogContext);
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => PaymentScreen(
+                                orderType: widget.orderType,
+                                customerName: customerName,
+                              ),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(52),
+                          backgroundColor: const Color(0xFF1F6D44),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: const Text(
+                          'Continue',
+                          style: TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    nameController.dispose();
+  }
+
+  void _showVivianChat() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => VivianChatSheet(orderType: widget.orderType),
+    );
   }
 
   @override
@@ -156,7 +307,6 @@ class _MenuScreenState extends State<MenuScreen>
             return Stack(
               children: [
                 _buildMainContent(cart),
-
                 Positioned(
                   left: _vivianLeft,
                   top: _vivianTop,
@@ -340,8 +490,8 @@ class _MenuScreenState extends State<MenuScreen>
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
+                          children: const [
+                            Text(
                               'Vivian',
                               style: TextStyle(
                                 color: Colors.white,
@@ -350,10 +500,10 @@ class _MenuScreenState extends State<MenuScreen>
                                 height: 1.0,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             Row(
                               mainAxisSize: MainAxisSize.min,
-                              children: const [
+                              children: [
                                 _TypingDot(delay: 0),
                                 SizedBox(width: 3),
                                 _TypingDot(delay: 180),
@@ -452,7 +602,14 @@ class _MenuScreenState extends State<MenuScreen>
                   ),
                 ),
                 const SizedBox(width: 16),
-                SizedBox(width: 340, child: _buildSearchField()),
+                if (_showSearch)
+                  SizedBox(width: 340, child: _buildSearchField())
+                else
+                  _buildSearchToggleButton(),
+                if (_showSearch) ...[
+                  const SizedBox(width: 10),
+                  _buildSearchToggleButton(),
+                ],
               ],
             )
           : Column(
@@ -466,12 +623,36 @@ class _MenuScreenState extends State<MenuScreen>
                     _buildLogo(size: isSmall ? 44 : 48),
                     const SizedBox(width: 10),
                     Expanded(child: _buildTitleSection(compact: true)),
+                    const SizedBox(width: 8),
+                    _buildSearchToggleButton(),
                   ],
                 ),
-                const SizedBox(height: 12),
-                _buildSearchField(),
+                if (_showSearch) ...[
+                  const SizedBox(height: 12),
+                  _buildSearchField(),
+                ],
               ],
             ),
+    );
+  }
+
+  Widget _buildSearchToggleButton() {
+    return InkWell(
+      onTap: _toggleSearch,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: 42,
+        height: 42,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF3F5F7),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Icon(
+          _showSearch ? Icons.close_rounded : Icons.search_rounded,
+          color: const Color(0xFF1E2C24),
+          size: 20,
+        ),
+      ),
     );
   }
 
@@ -1137,33 +1318,10 @@ class _MenuScreenState extends State<MenuScreen>
               ),
               onPressed: cart.itemList.isEmpty
                   ? null
-                  : () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              PaymentScreen(orderType: widget.orderType),
-                        ),
-                      );
-                    },
+                  : () => _showCustomerInfoDialog(),
               child: const Text(
                 'Proceed to Payment',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          TextButton(
-            onPressed: cart.itemList.isEmpty
-                ? null
-                : () {
-                    context.read<CartProvider>().clearCart();
-                  },
-            child: const Text(
-              'Clear All',
-              style: TextStyle(
-                color: Color(0xFF8A9890),
-                fontWeight: FontWeight.w800,
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15.5),
               ),
             ),
           ),
@@ -1174,17 +1332,10 @@ class _MenuScreenState extends State<MenuScreen>
 
   Widget _buildMobileCartBar(CartProvider cart) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(top: BorderSide(color: Color(0xFFE7EBEE))),
-        boxShadow: [
-          BoxShadow(
-            color: Color(0x12000000),
-            blurRadius: 12,
-            offset: Offset(0, -3),
-          ),
-        ],
       ),
       child: SafeArea(
         top: false,
@@ -1194,10 +1345,10 @@ class _MenuScreenState extends State<MenuScreen>
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
-                  vertical: 12,
+                  vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF2F6F3),
+                  color: const Color(0xFFF3F7F4),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
@@ -1206,117 +1357,48 @@ class _MenuScreenState extends State<MenuScreen>
                     Text(
                       '${cart.totalItems} item${cart.totalItems == 1 ? '' : 's'}',
                       style: const TextStyle(
-                        color: Color(0xFF6E7A74),
+                        color: Color(0xFF6D7A73),
                         fontWeight: FontWeight.w700,
                         fontSize: 12,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Text(
                       '₱${cart.totalAmount.toStringAsFixed(0)}',
                       style: const TextStyle(
                         color: Color(0xFF1F6D44),
                         fontWeight: FontWeight.w900,
-                        fontSize: 20,
+                        fontSize: 19,
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: SizedBox(
-                height: 54,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1F6D44),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
+            const SizedBox(width: 12),
+            SizedBox(
+              height: 56,
+              child: ElevatedButton(
+                onPressed: cart.itemList.isEmpty
+                    ? null
+                    : () => _showCustomerInfoDialog(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1F6D44),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  onPressed: _showCartBottomSheet,
-                  child: const Text(
-                    'View Cart',
-                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15),
-                  ),
+                ),
+                child: const Text(
+                  'Checkout',
+                  style: TextStyle(fontWeight: FontWeight.w800),
                 ),
               ),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  void _showCartBottomSheet() {
-    final cart = context.read<CartProvider>();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
-      ),
-      builder: (context) {
-        return SafeArea(
-          top: false,
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.82,
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
-                Container(
-                  width: 64,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD7DDE1),
-                    borderRadius: BorderRadius.circular(99),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
-                  child: Row(
-                    children: [
-                      const Expanded(
-                        child: Text(
-                          'Current Order',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                            color: Color(0xFF223128),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 7,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF2F6F3),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '${cart.totalItems}',
-                          style: const TextStyle(
-                            color: Color(0xFF1F6D44),
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(child: _buildCartItems(cart)),
-                _buildCartFooter(cart),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -1431,7 +1513,7 @@ class _MenuScreenState extends State<MenuScreen>
                               product.prices[variant] ?? product.basePrice;
 
                           return InkWell(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(16),
                             onTap: () {
                               setModal(() {
                                 selectedVariant = variant;
@@ -1445,12 +1527,12 @@ class _MenuScreenState extends State<MenuScreen>
                               decoration: BoxDecoration(
                                 color: selected
                                     ? const Color(0xFF1F6D44)
-                                    : Colors.white,
-                                borderRadius: BorderRadius.circular(14),
+                                    : const Color(0xFFF6F8F9),
+                                borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
                                   color: selected
                                       ? const Color(0xFF1F6D44)
-                                      : const Color(0xFFE3E8EC),
+                                      : const Color(0xFFE2E7EB),
                                 ),
                               ),
                               child: Column(
@@ -1461,8 +1543,8 @@ class _MenuScreenState extends State<MenuScreen>
                                     style: TextStyle(
                                       color: selected
                                           ? Colors.white
-                                          : const Color(0xFF314933),
-                                      fontWeight: FontWeight.w700,
+                                          : const Color(0xFF223128),
+                                      fontWeight: FontWeight.w800,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -1470,9 +1552,9 @@ class _MenuScreenState extends State<MenuScreen>
                                     '₱${variantPrice.toStringAsFixed(0)}',
                                     style: TextStyle(
                                       color: selected
-                                          ? const Color(0xFFE9F5EC)
-                                          : const Color(0xFF1F6D44),
-                                      fontWeight: FontWeight.w800,
+                                          ? Colors.white
+                                          : const Color(0xFF6E7A74),
+                                      fontWeight: FontWeight.w700,
                                     ),
                                   ),
                                 ],
@@ -1482,10 +1564,51 @@ class _MenuScreenState extends State<MenuScreen>
                         }).toList(),
                       ),
                       const SizedBox(height: 18),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF3F7F4),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Row(
+                          children: [
+                            const Text(
+                              'Selected Price',
+                              style: TextStyle(
+                                color: Color(0xFF6E7A74),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const Spacer(),
+                            Text(
+                              '₱${price.toStringAsFixed(0)}',
+                              style: const TextStyle(
+                                color: Color(0xFF1F6D44),
+                                fontWeight: FontWeight.w900,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 18),
                       SizedBox(
                         width: double.infinity,
-                        height: 52,
+                        height: 54,
                         child: ElevatedButton(
+                          onPressed: () {
+                            context.read<CartProvider>().addItem(
+                              product: product,
+                              variant: selectedVariant,
+                            );
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('${product.name} added to cart'),
+                              ),
+                            );
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1F6D44),
                             foregroundColor: Colors.white,
@@ -1493,16 +1616,9 @@ class _MenuScreenState extends State<MenuScreen>
                               borderRadius: BorderRadius.circular(16),
                             ),
                           ),
-                          onPressed: () {
-                            context.read<CartProvider>().addItem(
-                              product: product,
-                              variant: selectedVariant,
-                            );
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            'Add to Order • ₱${price.toStringAsFixed(0)}',
-                            style: const TextStyle(
+                          child: const Text(
+                            'Add to Cart',
+                            style: TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 15,
                             ),
@@ -1520,54 +1636,47 @@ class _MenuScreenState extends State<MenuScreen>
     );
   }
 
-  void _showVivianChat() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => VivianChatSheet(orderType: widget.orderType),
-    );
-  }
-
-  String _prettyVariant(String value) {
-    switch (value) {
+  String _prettyVariant(String variant) {
+    switch (variant) {
       case 'hot':
         return 'Hot';
       case 'iced12':
         return 'Iced 12oz';
       case 'iced16':
         return 'Iced 16oz';
-      case 'withDrink':
-        return 'With Drink';
-      case 'withoutDrink':
-        return 'Without Drink';
-      case 'slice':
-        return 'Slice';
-      case 'whole':
-        return 'Whole';
       case 'regular':
         return 'Regular';
       case 'large':
         return 'Large';
+      case 'withDrink':
+        return 'With Drink';
+      case 'slice':
+        return 'Slice';
       default:
-        return value.replaceAll('_', ' ');
+        return variant
+            .replaceAll('_', ' ')
+            .split(' ')
+            .map(
+              (e) => e.isEmpty ? e : '${e[0].toUpperCase()}${e.substring(1)}',
+            )
+            .join(' ');
     }
   }
 
-  String _chipEmoji(String id) {
-    switch (id) {
+  String _chipEmoji(String categoryId) {
+    switch (categoryId) {
       case 'best_sellers':
         return '⭐';
       case 'drinks':
         return '☕';
       case 'meals':
-        return '🍛';
+        return '🍽';
       case 'snacks':
         return '🍟';
       case 'desserts':
         return '🍰';
       default:
-        return '🍽';
+        return '🛒';
     }
   }
 
@@ -1576,14 +1685,142 @@ class _MenuScreenState extends State<MenuScreen>
       case 'drinks':
         return '☕';
       case 'meals':
-        return '🍛';
+        return '🍽';
       case 'snacks':
         return '🍟';
       case 'desserts':
         return '🍰';
       default:
-        return '🍽';
+        return '🛍';
     }
+  }
+}
+
+class _ProductGridCard extends StatelessWidget {
+  final ProductModel product;
+  final VoidCallback onAdd;
+  final String emoji;
+
+  const _ProductGridCard({
+    required this.product,
+    required this.onAdd,
+    required this.emoji,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final displayPrice = product.availableVariants.isNotEmpty
+        ? (product.prices[product.availableVariants.first] ?? product.basePrice)
+        : product.basePrice;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFE6EAEE)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0C000000),
+            blurRadius: 14,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Align(
+            alignment: Alignment.topRight,
+            child: product.isBestSeller
+                ? Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF5DD),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: const Text(
+                      'Best Seller',
+                      style: TextStyle(
+                        color: Color(0xFF9D6C00),
+                        fontWeight: FontWeight.w800,
+                        fontSize: 11,
+                      ),
+                    ),
+                  )
+                : const SizedBox(height: 26),
+          ),
+          const SizedBox(height: 4),
+          Center(
+            child: Container(
+              width: 76,
+              height: 76,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F7F8),
+                borderRadius: BorderRadius.circular(22),
+              ),
+              child: Center(
+                child: Text(emoji, style: const TextStyle(fontSize: 34)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            product.name,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Color(0xFF223128),
+              fontWeight: FontWeight.w900,
+              fontSize: 15.5,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            product.description,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Color(0xFF7B8781),
+              fontWeight: FontWeight.w600,
+              fontSize: 12.5,
+              height: 1.35,
+            ),
+          ),
+          const Spacer(),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '₱${displayPrice.toStringAsFixed(0)}',
+                  style: const TextStyle(
+                    color: Color(0xFF1F6D44),
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: onAdd,
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1F6D44),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(Icons.add_rounded, color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -1611,7 +1848,7 @@ class _TypingDotState extends State<_TypingDot>
     );
 
     _scale = Tween<double>(
-      begin: 0.7,
+      begin: 0.75,
       end: 1.2,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
@@ -1633,173 +1870,11 @@ class _TypingDotState extends State<_TypingDot>
     return ScaleTransition(
       scale: _scale,
       child: Container(
-        width: 5,
-        height: 5,
+        width: 6,
+        height: 6,
         decoration: const BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle,
-        ),
-      ),
-    );
-  }
-}
-
-class _ProductGridCard extends StatelessWidget {
-  final ProductModel product;
-  final VoidCallback onAdd;
-  final String emoji;
-
-  const _ProductGridCard({
-    required this.product,
-    required this.onAdd,
-    required this.emoji,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final minPrice = product.prices.values.isEmpty
-        ? 0.0
-        : product.prices.values.reduce((a, b) => a < b ? a : b);
-
-    return InkWell(
-      onTap: onAdd,
-      borderRadius: BorderRadius.circular(18),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: const Color(0xFFE5EAEE)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.035),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Container(
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF4F6F8),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
-                ),
-                child: product.imageUrl.trim().isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(18),
-                        ),
-                        child: Image.asset(
-                          product.imageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) {
-                            return Center(
-                              child: Text(
-                                emoji,
-                                style: const TextStyle(fontSize: 44),
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                    : Center(
-                        child: Text(
-                          emoji,
-                          style: const TextStyle(fontSize: 44),
-                        ),
-                      ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (product.isBestSeller) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFF2CC),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Text(
-                        'BESTSELLER',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Color(0xFFB57A00),
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                  Text(
-                    product.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14.5,
-                      height: 1.2,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF2E3D35),
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    product.description,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 12.2,
-                      height: 1.3,
-                      color: Color(0xFF86918B),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          '₱${minPrice.toStringAsFixed(0)}',
-                          style: const TextStyle(
-                            color: Color(0xFF1F6D44),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 34,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1F6D44),
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          onPressed: onAdd,
-                          child: const Text(
-                            'Add',
-                            style: TextStyle(fontWeight: FontWeight.w900),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );
