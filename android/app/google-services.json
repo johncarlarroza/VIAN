@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "894806698727",
+    "project_id": "vian-5fc12",
+    "storage_bucket": "vian-5fc12.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:894806698727:android:72594e11a2566ceecc1042",
+        "android_client_info": {
+          "package_name": "com.example.vian_kopi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_YkzeKITyoU_5eZ8iIcm-afi8gormrxk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

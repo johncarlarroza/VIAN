@@ -1,0 +1,36 @@
+name: vian_kopi
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  cloud_firestore: ^6.3.0
+  cloud_functions: ^6.2.0
+  flutter:
+    sdk: flutter
+  pdf: ^3.12.0
+  printing: ^5.14.3
+  provider: ^6.1.5+1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+    - assets/vianlogo.png
+    - assets/logo.png
+    - assets/qr.png 
+    - assets/vivian_logo.gif
+    - assets/americano.png
+    - assets/burgersteak.png
+    - assets/fries.png
+    - assets/latte.png
+    - assets/ubecake.png
