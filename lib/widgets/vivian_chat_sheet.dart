@@ -30,7 +30,7 @@ class _VivianChatSheetState extends State<VivianChatSheet>
   final List<_ChatMessage> _messages = [
     _ChatMessage(
       text:
-          'Hi! I’m Vivian ✨\nI can help with menu items, prices, food suggestions, coffee recommendations, and your cart.',
+          'Hi! I’m Vivian ✨\nI can help with menu items, prices, ingredients, pairings, recommendations, and your cart.',
       isUser: false,
     ),
   ];
@@ -51,8 +51,8 @@ class _VivianChatSheetState extends State<VivianChatSheet>
 
     _slideAnimation =
         Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(
-          CurvedAnimation(parent: _sheetController, curve: Curves.easeOutCubic),
-        );
+      CurvedAnimation(parent: _sheetController, curve: Curves.easeOutCubic),
+    );
 
     _sheetController.forward();
   }
@@ -65,8 +65,8 @@ class _VivianChatSheetState extends State<VivianChatSheet>
     super.dispose();
   }
 
-  Future<void> _send() async {
-    final text = _controller.text.trim();
+  Future<void> _send({String? presetText}) async {
+    final text = (presetText ?? _controller.text).trim();
     if (text.isEmpty || _isSending) return;
 
     final cart = context.read<CartProvider>();
@@ -99,7 +99,7 @@ class _VivianChatSheetState extends State<VivianChatSheet>
         );
         _isSending = false;
       });
-    } catch (e) {
+    } catch (_) {
       if (!mounted) return;
 
       setState(() {
@@ -145,9 +145,8 @@ class _VivianChatSheetState extends State<VivianChatSheet>
           child: SlideTransition(
             position: _slideAnimation,
             child: Align(
-              alignment: isWide
-                  ? Alignment.bottomRight
-                  : Alignment.bottomCenter,
+              alignment:
+                  isWide ? Alignment.bottomRight : Alignment.bottomCenter,
               child: Container(
                 margin: EdgeInsets.fromLTRB(
                   isWide ? 0 : 10,
@@ -187,12 +186,8 @@ class _VivianChatSheetState extends State<VivianChatSheet>
                             ),
                             child: ListView.builder(
                               controller: _scrollController,
-                              padding: const EdgeInsets.fromLTRB(
-                                14,
-                                14,
-                                14,
-                                10,
-                              ),
+                              padding:
+                                  const EdgeInsets.fromLTRB(14, 14, 14, 10),
                               itemCount: _messages.length,
                               itemBuilder: (context, index) {
                                 final m = _messages[index];
@@ -326,9 +321,10 @@ class _VivianChatSheetState extends State<VivianChatSheet>
 
   Widget _buildQuickPrompts() {
     final prompts = [
-      'Best coffee?',
+      'What is your best coffee?',
       'What meals do you suggest?',
       'Recommend something sweet',
+      'What is in my cart?',
     ];
 
     return Container(
@@ -346,17 +342,10 @@ class _VivianChatSheetState extends State<VivianChatSheet>
               padding: const EdgeInsets.only(right: 8),
               child: InkWell(
                 borderRadius: BorderRadius.circular(999),
-                onTap: _isSending
-                    ? null
-                    : () {
-                        _controller.text = prompt;
-                        _send();
-                      },
+                onTap: _isSending ? null : () => _send(presetText: prompt),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 9,
-                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(999),
@@ -412,7 +401,7 @@ class _VivianChatSheetState extends State<VivianChatSheet>
             _DotPulse(delay: 320),
             SizedBox(width: 10),
             Text(
-              'Vivian is typing...',
+              'Vivian is typing.',
               style: TextStyle(
                 color: Color(0xFF5D6E65),
                 fontWeight: FontWeight.w600,
@@ -427,27 +416,20 @@ class _VivianChatSheetState extends State<VivianChatSheet>
 
   Widget _buildInputArea() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 16),
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 14),
       decoration: const BoxDecoration(
-        color: Color(0xFFF7FBF8),
+        color: Colors.white,
         border: Border(top: BorderSide(color: Color(0xFFE4ECE6))),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
             child: Container(
+              constraints: const BoxConstraints(minHeight: 52),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFFDCE8DF)),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x10000000),
-                    blurRadius: 8,
-                    offset: Offset(0, 3),
-                  ),
-                ],
+                color: const Color(0xFFF4F7F5),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFFE1E8E3)),
               ),
               child: TextField(
                 controller: _controller,
@@ -456,60 +438,60 @@ class _VivianChatSheetState extends State<VivianChatSheet>
                 textInputAction: TextInputAction.send,
                 onSubmitted: (_) => _send(),
                 decoration: const InputDecoration(
-                  hintText: 'Ask Vivian about coffee, meals, prices...',
+                  hintText: 'Ask Vivian about menu items, recommendations, or your cart...',
                   hintStyle: TextStyle(
-                    color: Color(0xFF94A39A),
+                    color: Color(0xFF93A19A),
                     fontWeight: FontWeight.w500,
                   ),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 18,
-                    vertical: 14,
-                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
               ),
             ),
           ),
           const SizedBox(width: 10),
           SizedBox(
-            height: 52,
             width: 52,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF166534), Color(0xFF2F7B45)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x332F7B45),
-                    blurRadius: 12,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: const CircleBorder(),
-                  padding: EdgeInsets.zero,
-                ),
-                onPressed: _isSending ? null : _send,
-                child: const Icon(
-                  Icons.send_rounded,
-                  color: Colors.white,
-                  size: 22,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: _isSending ? null : () => _send(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1F6D44),
+                foregroundColor: Colors.white,
+                disabledBackgroundColor: const Color(0xFFC8D5CD),
+                elevation: 0,
+                padding: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
               ),
+              child: _isSending
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.send_rounded),
             ),
           ),
         ],
       ),
     );
   }
+}
+
+class _ChatMessage {
+  final String text;
+  final bool isUser;
+
+  _ChatMessage({
+    required this.text,
+    required this.isUser,
+  });
 }
 
 class _ChatBubble extends StatelessWidget {
@@ -519,30 +501,41 @@ class _ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isUser = message.isUser;
+    final align =
+        message.isUser ? Alignment.centerRight : Alignment.centerLeft;
+
+    final bubbleColor =
+        message.isUser ? const Color(0xFF1F6D44) : Colors.white;
+
+    final textColor =
+        message.isUser ? Colors.white : const Color(0xFF223128);
+
+    final borderRadius = message.isUser
+        ? const BorderRadius.only(
+            topLeft: Radius.circular(18),
+            topRight: Radius.circular(18),
+            bottomLeft: Radius.circular(18),
+            bottomRight: Radius.circular(6),
+          )
+        : const BorderRadius.only(
+            topLeft: Radius.circular(18),
+            topRight: Radius.circular(18),
+            bottomLeft: Radius.circular(6),
+            bottomRight: Radius.circular(18),
+          );
 
     return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: align,
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 410),
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+        margin: const EdgeInsets.only(bottom: 10),
+        constraints: const BoxConstraints(maxWidth: 320),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          gradient: isUser
-              ? const LinearGradient(
-                  colors: [Color(0xFF1C6739), Color(0xFF2F7B45)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
-          color: isUser ? null : Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(18),
-            topRight: const Radius.circular(18),
-            bottomLeft: Radius.circular(isUser ? 18 : 6),
-            bottomRight: Radius.circular(isUser ? 6 : 18),
-          ),
-          border: isUser ? null : Border.all(color: const Color(0xFFE4ECE6)),
+          color: bubbleColor,
+          borderRadius: borderRadius,
+          border: message.isUser
+              ? null
+              : Border.all(color: const Color(0xFFE3ECE5)),
           boxShadow: const [
             BoxShadow(
               color: Color(0x12000000),
@@ -554,10 +547,10 @@ class _ChatBubble extends StatelessWidget {
         child: Text(
           message.text,
           style: TextStyle(
-            color: isUser ? Colors.white : const Color(0xFF415148),
+            color: textColor,
             fontWeight: FontWeight.w600,
             fontSize: 14,
-            height: 1.5,
+            height: 1.45,
           ),
         ),
       ),
@@ -577,7 +570,7 @@ class _DotPulse extends StatefulWidget {
 class _DotPulseState extends State<_DotPulse>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _scale;
+  late final Animation<double> _opacity;
 
   @override
   void initState() {
@@ -588,10 +581,9 @@ class _DotPulseState extends State<_DotPulse>
       duration: const Duration(milliseconds: 900),
     );
 
-    _scale = Tween<double>(
-      begin: 0.7,
-      end: 1.25,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    _opacity = Tween<double>(begin: 0.25, end: 1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
 
     Future.delayed(Duration(milliseconds: widget.delay), () {
       if (mounted) {
@@ -608,23 +600,16 @@ class _DotPulseState extends State<_DotPulse>
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _scale,
+    return FadeTransition(
+      opacity: _opacity,
       child: Container(
         width: 6,
         height: 6,
         decoration: const BoxDecoration(
-          color: Color(0xFF2F7B45),
+          color: Color(0xFF5D6E65),
           shape: BoxShape.circle,
         ),
       ),
     );
   }
-}
-
-class _ChatMessage {
-  final String text;
-  final bool isUser;
-
-  _ChatMessage({required this.text, required this.isUser});
 }

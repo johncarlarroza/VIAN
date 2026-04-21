@@ -14,6 +14,13 @@ class ProductModel {
   final int sortOrder;
   final List<String> tags;
 
+  // ✅ Added for smarter Vivian AI
+  final List<String> ingredients;
+  final String beanType;
+  final String caffeineLevel;
+  final String sweetness;
+  final String bestFor;
+
   const ProductModel({
     required this.id,
     required this.name,
@@ -29,6 +36,13 @@ class ProductModel {
     this.displayType = 'general',
     this.sortOrder = 0,
     this.tags = const [],
+
+    // ✅ Added for smarter Vivian AI
+    this.ingredients = const [],
+    this.beanType = '',
+    this.caffeineLevel = '',
+    this.sweetness = '',
+    this.bestFor = '',
   });
 
   double get basePrice {
@@ -49,6 +63,7 @@ class ProductModel {
 
     final rawVariants = (map['availableVariants'] as List<dynamic>? ?? []);
     final rawTags = (map['tags'] as List<dynamic>? ?? []);
+    final rawIngredients = (map['ingredients'] as List<dynamic>? ?? []);
 
     return ProductModel(
       id: (map['id'] ?? '').toString(),
@@ -69,6 +84,13 @@ class ProductModel {
           ? (map['sortOrder'] ?? 0) as int
           : int.tryParse(map['sortOrder'].toString()) ?? 0,
       tags: rawTags.map((e) => e.toString()).toList(),
+
+      // ✅ Added fields
+      ingredients: rawIngredients.map((e) => e.toString()).toList(),
+      beanType: (map['beanType'] ?? '').toString(),
+      caffeineLevel: (map['caffeineLevel'] ?? '').toString(),
+      sweetness: (map['sweetness'] ?? '').toString(),
+      bestFor: (map['bestFor'] ?? '').toString(),
     );
   }
 
@@ -88,6 +110,13 @@ class ProductModel {
       'displayType': displayType,
       'sortOrder': sortOrder,
       'tags': tags,
+
+      // ✅ Added fields
+      'ingredients': ingredients,
+      'beanType': beanType,
+      'caffeineLevel': caffeineLevel,
+      'sweetness': sweetness,
+      'bestFor': bestFor,
     };
   }
 
@@ -106,6 +135,11 @@ class ProductModel {
     String? displayType,
     int? sortOrder,
     List<String>? tags,
+    List<String>? ingredients,
+    String? beanType,
+    String? caffeineLevel,
+    String? sweetness,
+    String? bestFor,
   }) {
     return ProductModel(
       id: id ?? this.id,
@@ -122,6 +156,11 @@ class ProductModel {
       displayType: displayType ?? this.displayType,
       sortOrder: sortOrder ?? this.sortOrder,
       tags: tags ?? this.tags,
+      ingredients: ingredients ?? this.ingredients,
+      beanType: beanType ?? this.beanType,
+      caffeineLevel: caffeineLevel ?? this.caffeineLevel,
+      sweetness: sweetness ?? this.sweetness,
+      bestFor: bestFor ?? this.bestFor,
     );
   }
 }

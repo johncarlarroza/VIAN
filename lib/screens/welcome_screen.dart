@@ -53,7 +53,7 @@ class WelcomeScreen extends StatelessWidget {
                     ],
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 20),
 
                   const Text(
                     'How would you like to order?',
@@ -103,7 +103,7 @@ class WelcomeScreen extends StatelessWidget {
                     ],
                   ),
 
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 15),
 
                   const Text(
                     'Freshly prepared. Simply better.',

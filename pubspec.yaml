@@ -7,10 +7,10 @@ environment:
   sdk: ^3.10.0
 
 dependencies:
-  cloud_firestore: ^6.3.0
-  cloud_functions: ^6.2.0
   flutter:
     sdk: flutter
+  cloud_firestore: ^6.3.0
+  cloud_functions: ^6.2.0
   pdf: ^3.12.0
   printing: ^5.14.3
   provider: ^6.1.5+1
@@ -21,16 +21,27 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
 flutter:
-
   uses-material-design: true
 
   assets:
+    - assets/
     - assets/vianlogo.png
     - assets/logo.png
-    - assets/qr.png 
+    - assets/qr.png
     - assets/vivian_logo.gif
     - assets/americano.png
     - assets/burgersteak.png
     - assets/fries.png
     - assets/latte.png
     - assets/ubecake.png
+    - assets/Cafe Bites/
+    - assets/Coffee/
+    - assets/Frappe/
+    - assets/Non Coffee/
+    - assets/Pasta/
+    - assets/Pizza/
+    - assets/Desserts/
+    - assets/Rice bowls/
+    - assets/Side Bites/
+    - assets/Special Coffee/
+    - assets/Vian Freshers/
