@@ -818,3 +818,52 @@ exports.askVivian = onCall(
     }
   }
 );
+
+module.exports.__test = {
+  safeString,
+  safeList,
+  toNumber,
+  peso,
+  cleanReply,
+  clampText,
+  normalizeVariantLabel,
+  uniqueStrings,
+  normalizeProduct,
+  formatCart,
+  formatMenu,
+  normalizeLegacyMenuContext,
+  extractMenuBlocks,
+  getItemNameFromBlock,
+  getFieldFromBlock,
+  parsePriceValues,
+  dedupeBlocksByName,
+  findMenuMatch,
+  findItemsByKeyword,
+  getBestSellerItems,
+  getAffordableItems,
+  summarizeCart,
+  inferPreferenceKeywords,
+  buildPairingSuggestion,
+  namesFromBlocks,
+  buildVivianFallback,
+};
+
+module.exports.__test = {
+  safeString,
+  safeList,
+  toNumber,
+  peso,
+  cleanReply,
+  clampText,
+  normalizeVariantLabel,
+  uniqueStrings,
+  normalizeProduct,
+  formatCart,
+  formatMenu,
+  extractMenuBlocks,
+  findMenuMatch,
+  getAffordableItems,
+  summarizeCart,
+  inferPreferenceKeywords,
+  buildVivianFallback,
+};
